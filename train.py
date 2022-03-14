@@ -199,7 +199,7 @@ class Trainer():
         global_idx = 0
         best_scores = {'F1': -1.0, 'EM': -1.0}
         tbx = SummaryWriter(self.save_dir)
-        print(len(train_dataloader.dataset), len(train_dataloader))
+        # print(len(train_dataloader.dataset), len(train_dataloader))
         for epoch_num in range(self.num_epochs):
             self.log.info(f'Epoch: {epoch_num}')
             with torch.enable_grad(), tqdm(total=len(train_dataloader.dataset)) as progress_bar:
@@ -250,9 +250,9 @@ def get_dataset(args, datasets, data_dir, tokenizer, split_name):
         dataset_dict_curr = util.read_squad(f'{data_dir}/{dataset}')
         dataset_dict = util.merge(dataset_dict, dataset_dict_curr)
 
-    if args.device == torch.device('cpu'):
-        print("Training locally")
-        dataset_dict = util.subsample(args, dataset_dict)
+    # if args.device == torch.device('cpu'):
+    #     print("Training locally")
+    #     dataset_dict = util.subsample(args, dataset_dict)
 
     data_encodings = read_and_process(args, tokenizer, dataset_dict, data_dir, dataset_name, split_name)
     return util.QADataset(data_encodings, train=(split_name=='train')), dataset_dict
@@ -278,43 +278,6 @@ def main():
         # print(train_dataset[0:1])
         log.info("Preparing Validation Data...")
         val_dataset, val_dict = get_dataset(args, args.train_datasets, args.val_dir, tokenizer, 'val')
-
-        # if args.device == torch.device('cpu'):
-        #     train_dataset, train_sample_idx = util.subsample(train_dataset, args.sample_p)
-        #     val_dataset, val_sample_idx = util.subsample(val_dataset, args.sample_p)
-        #     # print(len(val_dataset), len(val_dict), len(val_dict['question']), 
-        #     #       len(val_dict['answer']), val_dict.keys())
-        #     # print(val_dict['id'][0], val_dict['question'][0], val_dict['answer'][0])
-        #     val_dict_filtered = dict()
-        #     for key, value in val_dict.items():
-        #         print(key)
-        #         print(val_sample_idx)
-        #         print(value[0])
-        #         val_dict_filtered[key] = [value[idx] for idx in val_sample_idx]
-        #     print(len(val_dataset), len(val_dict_filtered['question']))
-
-        # if args.device == torch.device('cpu'):
-        #     log.info("Training locally")
-        #     train_loader, train_sample_idx = util.subsample(train_dataset, args.sample_p)
-        #     val_loader, val_sample_idx = util.subsample(val_dataset, args.sample_p)
-        #     print(len(train_loader))
-        #     # val_dict_filtered = dict()
-        #     # for key, value in val_dict.items():
-        #     #     # print(key)
-        #     #     # print(val_sample_idx)
-        #     #     # print(value[0])
-        #     #     val_dict_filtered[key] = [value[idx] for idx in val_sample_idx]
-        #     # # print(len(val_dataset), len(val_dict_filtered['question']))
-
-        # else:
-        #     log.info("Training on azure")
-        #     train_loader = DataLoader(train_dataset,
-        #                             batch_size=args.batch_size,
-        #                             sampler=RandomSampler(train_dataset))
-                                    
-        #     val_loader = DataLoader(val_dataset,
-        #                             batch_size=args.batch_size,
-        #                             sampler=SequentialSampler(val_dataset))
         
         train_loader = DataLoader(train_dataset,
                                 batch_size=args.batch_size,

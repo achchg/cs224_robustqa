@@ -320,7 +320,10 @@ def postprocess_qa_predictions(examples, features, predictions,
     example_id_to_index = {k: i for i, k in enumerate(examples["id"])}
     features_per_example = ddict(list)
     for i, feat_id in enumerate(features['id']):
-        features_per_example[example_id_to_index[feat_id]].append(i)
+        try:
+            features_per_example[example_id_to_index[feat_id]].append(i)
+        except:
+            print(i)
 
     # The dictionaries we have to fill.
     all_predictions = OrderedDict()
